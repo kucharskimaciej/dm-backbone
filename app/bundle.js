@@ -47,26 +47,44 @@
 	"use strict";
 
 	var SongView = Backbone.View.extend({
-	    template: _.template("<li class=\"list-group-item\"><strong><%= author %></strong> - <%= title %></li>"),
+	    tagName: "li",
+	    className: "list-group-item",
+	    template: _.template("<strong><%= author %></strong> - <%= title %>"),
+	    render: function render() {
+	        this.$el.html(this.template(this.model));
+	        return this;
+	    }
+	});
+
+	var SongsView = Backbone.View.extend({
+	    el: "#songs",
+	    songs: [{
+	        author: "Megadeth",
+	        title: "Ace of Spades"
+	    }, {
+	        author: "Metallica",
+	        title: "For Whom The Bell Tolls"
+	    }],
 	    initialize: function initialize() {
-	        console.log(this);
-	        this.song = {
-	            author: "Megadeth",
-	            title: "Ace of Spades"
-	        };
 	        this.render();
 	    },
 	    render: function render() {
-	        this.$el.append(this.template(this.song));
+	        var _this = this;
+
+	        this.$el.empty();
+	        this.songs.forEach(function (song) {
+	            var view = new SongView({
+	                model: song
+	            });
+
+	            _this.$el.append(view.render().el);
+	        });
 
 	        return this;
 	    }
-
 	});
 
-	new SongView({
-	    el: ".list-group"
-	});
+	new SongsView();
 
 /***/ }
 /******/ ]);
