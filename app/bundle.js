@@ -51,7 +51,7 @@
 	    className: "list-group-item",
 	    template: _.template("<strong><%= author %></strong> - <%= title %>"),
 	    render: function render() {
-	        this.$el.html(this.template(this.model));
+	        this.$el.html(this.template(this.model.attributes));
 	        return this;
 	    }
 	});
@@ -74,7 +74,7 @@
 	        this.$el.empty();
 	        this.songs.forEach(function (song) {
 	            var view = new SongView({
-	                model: song
+	                model: new Backbone.Model(song)
 	            });
 
 	            _this.$el.append(view.render().el);

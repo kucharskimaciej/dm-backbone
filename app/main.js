@@ -3,7 +3,7 @@ var SongView = Backbone.View.extend({
     className: 'list-group-item',
     template: _.template('<strong><%= author %></strong> - <%= title %>'),
     render: function () {
-        this.$el.html(this.template(this.model));
+        this.$el.html(this.template(this.model.attributes));
         return this;
     }
 });
@@ -27,7 +27,7 @@ var SongsView = Backbone.View.extend({
         this.$el.empty();
         this.songs.forEach((song) => {
             var view = new SongView({
-                model: song
+                model: new Backbone.Model(song)
             });
 
             this.$el.append(view.render().el);
