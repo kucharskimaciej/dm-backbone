@@ -46,6 +46,13 @@
 
 	"use strict";
 
+	var Song = Backbone.Model.extend({
+	    defaults: {
+	        author: "Unknown Artist",
+	        title: "Unnamed Track"
+	    }
+	});
+
 	var SongView = Backbone.View.extend({
 	    tagName: "li",
 	    className: "list-group-item",
@@ -64,7 +71,7 @@
 	    }, {
 	        author: "Metallica",
 	        title: "For Whom The Bell Tolls"
-	    }],
+	    }, {}],
 	    initialize: function initialize() {
 	        this.render();
 	    },
@@ -74,7 +81,7 @@
 	        this.$el.empty();
 	        this.songs.forEach(function (song) {
 	            var view = new SongView({
-	                model: new Backbone.Model(song)
+	                model: new Song(song)
 	            });
 
 	            _this.$el.append(view.render().el);
