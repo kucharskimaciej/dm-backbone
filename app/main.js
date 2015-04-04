@@ -26,7 +26,18 @@ var SongsView = Backbone.View.extend({
             author: 'Metallica',
             title: 'For Whom The Bell Tolls'
         },
-        {}
+        {
+            author: 'Satyricon',
+            title: 'K.I.N.G'
+        },
+        {
+            author: 'Alice Cooper',
+            title: 'Poison'
+        },
+        {
+            author: 'Ron James Dio',
+            title: 'Holy diver'
+        }
     ],
     initialize: function () {
         this.render();
