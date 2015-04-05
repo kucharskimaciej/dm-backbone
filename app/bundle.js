@@ -69,22 +69,38 @@
 
 	var SongsView = Backbone.View.extend({
 	    el: "#songs",
+	    events: {
+	        "keyup #filter": "onFilter"
+	    },
 	    initialize: function initialize() {
+	        this._collection = this.collection;
 	        this.render();
 	    },
 	    render: function render() {
 	        var _this = this;
 
-	        this.$el.empty();
+	        this.$("ul").empty();
 	        this.collection.forEach(function (song) {
 	            var view = new SongView({
 	                model: song
 	            });
 
-	            _this.$el.append(view.render().el);
+	            _this.$("ul").append(view.render().el);
 	        });
 
 	        return this;
+	    },
+	    onFilter: function onFilter() {
+	        var filter, models;
+	        filter = this.$("#filter").val().toLowerCase();
+
+	        models = this._collection.filter(function (item) {
+	            return JSON.stringify(item).toLowerCase().indexOf(filter) != -1;
+	        });
+
+	        // _collection.constructor refers to SongsCollection
+	        this.collection = new this._collection.constructor(models);
+	        this.render();
 	    }
 	});
 
