@@ -6,7 +6,15 @@ var Song = Backbone.Model.extend({
 });
 
 var SongsCollection = Backbone.Collection.extend({
-    model: Song
+    model: Song,
+    runFilter: function (predicate) {
+        var models;
+        models = this.filter((item) => {
+            return JSON.stringify(item).toLowerCase().indexOf(predicate) != -1;
+        });
+
+        return new SongsCollection(models);
+    }
 });
 
 var SongView = Backbone.View.extend({
@@ -41,15 +49,9 @@ var SongsView = Backbone.View.extend({
         return this;
     },
     onFilter: function () {
-        var filter, models;
+        var filter;
         filter = this.$('#filter').val().toLowerCase();
-
-        models = this._collection.filter((item) => {
-            return JSON.stringify(item).toLowerCase().indexOf(filter) != -1;
-        });
-
-        // _collection.constructor refers to SongsCollection
-        this.collection = new this._collection.constructor(models);
+        this.collection = this._collection.runFilter(filter);
         this.render();
     }
 });
