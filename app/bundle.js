@@ -62,6 +62,14 @@
 	        });
 
 	        return new SongsCollection(models);
+	    },
+	    runSort: function runSort(what, desc) {
+	        var models;
+	        models = this.sortBy(what);
+	        if (desc) {
+	            models = models.reverse();
+	        }
+	        return new SongsCollection(models);
 	    }
 	});
 
@@ -78,8 +86,15 @@
 	var SongsView = Backbone.View.extend({
 	    el: "#songs",
 	    events: {
-	        "keyup #filter": "onFilter"
+	        "keyup #filter": "onFilter",
+	        "click [action=sort]": "onSort"
 	    },
+	    filter: {
+	        by: "author",
+	        desc: false
+	    },
+	    sortUpIcon: "glyphicon-chevron-up",
+	    sortDownIcon: "glyphicon-chevron-down",
 	    initialize: function initialize() {
 	        this._collection = this.collection;
 	        this.render();
@@ -102,6 +117,19 @@
 	        var filter;
 	        filter = this.$("#filter").val().toLowerCase();
 	        this.collection = this._collection.runFilter(filter);
+
+	        this.render();
+	    },
+	    onSort: function onSort(ev) {
+	        this.filter = {
+	            by: this.$(ev.target).attr("by"),
+	            desc: !this.filter.desc
+	        };
+
+	        this.collection = this.collection.runSort(this.filter.by, this.filter.desc);
+
+	        this.$(ev.target).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
+
 	        this.render();
 	    }
 	});
