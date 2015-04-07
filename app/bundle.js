@@ -122,13 +122,13 @@
 	    },
 	    onSort: function onSort(ev) {
 	        this.filter = {
-	            by: this.$(ev.target).attr("by"),
+	            by: this.$(ev.currentTarget).attr("by"),
 	            desc: !this.filter.desc
 	        };
 
 	        this.collection = this.collection.runSort(this.filter.by, this.filter.desc);
 
-	        this.$(ev.target).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
+	        this.$(ev.currentTarget).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
 
 	        this.render();
 	    }
