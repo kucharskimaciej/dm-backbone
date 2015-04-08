@@ -1,8 +1,22 @@
 var Song = Backbone.Model.extend({
-   defaults: {
-       author: 'Unknown Artist',
-       title: 'Unnamed Track'
-   }
+    defaults: {
+        author: 'Unknown Artist',
+        title: 'Unnamed Track'
+    },
+    validate: function (attrs) {
+        var errors = {};
+
+        if(!attrs.author || attrs.author.length === 0) {
+            errors['author'] = 'Author is required';
+        }
+
+        if(!attrs.title || attrs.title.length === 0) {
+            errors['title'] = 'Title is required';
+        }
+
+        return !_.isEmpty(errors) ? errors : void 0;
+    }
+
 });
 
 var SongsCollection = Backbone.Collection.extend({
@@ -100,7 +114,8 @@ var SongsView = Backbone.View.extend({
 
 var FormView = Backbone.View.extend({
     events: {
-        'submit form': 'onSubmit'
+        'submit form': 'onSubmit',
+        'keyup form': 'runValidation'
     },
     getModel: function () {
       return new this.collection.model;
@@ -117,10 +132,37 @@ var FormView = Backbone.View.extend({
         });
         return serialized;
     },
+    clearErrors: function () {
+        this.$('.help-block').remove();
+        this.$('.form-group').removeClass('has-error');
+        this.$('form [type=submit]').removeAttr('disabled');
+    },
+    showErrors: function (errors) {
+        this.$('form [type=submit]').attr('disabled', 'disabled');
+        Object.keys(errors).forEach((err) => {
+            var help = $('<span class="help-block">').text(errors[err]);
+            this.$('[name='+err+']').parents('.form-group')
+                .addClass('has-error')
+                .append(help);
+        });
+    },
+    runValidation: function () {
+        this.clearErrors();
+        this.model.set(this.serialize());
+
+        if(!this.model.isValid()) {
+            this.showErrors(this.model.validationError);
+            return false;
+        }
+
+        return true;
+    },
     onSubmit: function (ev) {
         ev.preventDefault();
 
-        this.model.set(this.serialize());
+        if(!this.runValidation()) {
+            return;
+        }
 
         this.collection.add(this.model);
         this.model = this.getModel();
