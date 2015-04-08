@@ -51,18 +51,15 @@
 	        author: "Unknown Artist",
 	        title: "Unnamed Track"
 	    },
-	    validate: function validate(attrs) {
-	        var errors = {};
-
-	        if (!attrs.author || attrs.author.length === 0) {
-	            errors.author = "Author is required";
+	    validation: {
+	        title: {
+	            required: true,
+	            msg: "You must provide the title"
+	        },
+	        author: {
+	            required: true,
+	            msg: "You must provide the author"
 	        }
-
-	        if (!attrs.title || attrs.title.length === 0) {
-	            errors.title = "Title is required";
-	        }
-
-	        return !_.isEmpty(errors) ? errors : void 0;
 	    }
 
 	});
@@ -165,12 +162,21 @@
 	        "submit form": "onSubmit",
 	        "keyup form": "runValidation"
 	    },
-	    getModel: function getModel() {
-	        return new this.collection.model();
+	    resetModel: function resetModel() {
+	        this.model = new this.collection.model();
+	        Backbone.Validation.bind(this, {
+	            model: this.model,
+	            valid: function valid(view, attr) {},
+	            invalid: function invalid(view, attr, error) {
+	                var errors = {};
+	                errors[attr] = error;
+	                view.showErrors(errors);
+	            }
+	        });
 	    },
 	    initialize: function initialize(opts) {
 	        this.template = opts.template;
-	        this.model = this.getModel();
+	        this.resetModel();
 	        this.render();
 	    },
 	    clearErrors: function clearErrors() {
@@ -189,14 +195,9 @@
 	    },
 	    runValidation: function runValidation() {
 	        this.clearErrors();
-	        this.model.set(Backbone.Syphon.serialize(this));
+	        this.model.set(Backbone.Syphon.serialize(this), { validate: true });
 
-	        if (!this.model.isValid()) {
-	            this.showErrors(this.model.validationError);
-	            return false;
-	        }
-
-	        return true;
+	        return this.model.isValid();
 	    },
 	    onSubmit: function onSubmit(ev) {
 	        ev.preventDefault();
@@ -206,8 +207,8 @@
 	        }
 
 	        this.collection.add(this.model);
-	        this.model = this.getModel();
 
+	        this.resetModel();
 	        this.render();
 	    },
 	    render: function render() {
@@ -241,6 +242,8 @@
 	    collection: metalSongs,
 	    template: _.template($("#newSongForm").html())
 	});
+
+	//
 
 /***/ }
 /******/ ]);

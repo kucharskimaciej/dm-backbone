@@ -3,18 +3,15 @@ var Song = Backbone.Model.extend({
         author: 'Unknown Artist',
         title: 'Unnamed Track'
     },
-    validate: function (attrs) {
-        var errors = {};
-
-        if(!attrs.author || attrs.author.length === 0) {
-            errors['author'] = 'Author is required';
+    validation: {
+        title: {
+            required: true,
+            msg: 'You must provide the title'
+        },
+        author: {
+            required: true,
+            msg: 'You must provide the author'
         }
-
-        if(!attrs.title || attrs.title.length === 0) {
-            errors['title'] = 'Title is required';
-        }
-
-        return !_.isEmpty(errors) ? errors : void 0;
     }
 
 });
@@ -117,12 +114,23 @@ var FormView = Backbone.View.extend({
         'submit form': 'onSubmit',
         'keyup form': 'runValidation'
     },
-    getModel: function () {
-      return new this.collection.model;
+    resetModel: function () {
+        this.model = new this.collection.model;
+        Backbone.Validation.bind(this, {
+            model: this.model,
+            valid: function (view, attr) {
+                //
+            },
+            invalid: function (view, attr, error) {
+                var errors = {};
+                errors[attr] = error;
+                view.showErrors(errors)
+            }
+        });
     },
     initialize: function (opts) {
         this.template = opts.template;
-        this.model = this.getModel();
+        this.resetModel();
         this.render();
     },
     clearErrors: function () {
@@ -141,14 +149,9 @@ var FormView = Backbone.View.extend({
     },
     runValidation: function () {
         this.clearErrors();
-        this.model.set(Backbone.Syphon.serialize(this));
+        this.model.set(Backbone.Syphon.serialize(this), { validate: true });
 
-        if(!this.model.isValid()) {
-            this.showErrors(this.model.validationError);
-            return false;
-        }
-
-        return true;
+        return this.model.isValid();
     },
     onSubmit: function (ev) {
         ev.preventDefault();
@@ -158,8 +161,8 @@ var FormView = Backbone.View.extend({
         }
 
         this.collection.add(this.model);
-        this.model = this.getModel();
 
+        this.resetModel();
         this.render();
     },
     render: function () {
