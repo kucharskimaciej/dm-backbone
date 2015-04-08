@@ -9,7 +9,11 @@ var CollectionRender = {
         if(this.template) {
             this.$el.html(this.template());
         }
+        this.renderChildren();
+        return this;
 
+    },
+    renderChildren: function () {
         var collectionRoot = this.$(this.collectionRoot) || this.$el;
         collectionRoot.empty();
         this.collection.forEach((item) => {

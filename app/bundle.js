@@ -48,11 +48,7 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var Songs = _interopRequire(__webpack_require__(11));
-
-	var SongsView = _interopRequire(__webpack_require__(3));
-
-	var SongForm = _interopRequire(__webpack_require__(4));
+	var controller = _interopRequire(__webpack_require__(13));
 
 	var App = Backbone.Router.extend({
 	    rootEl: "#root",
@@ -62,32 +58,8 @@
 	        add: "addSong"
 	    },
 
-	    index: function index() {
-	        if (this.currentView) {
-	            this.currentView.stopListening();
-	            this.currentView.undelegateEvents();
-	        }
-	        var songs = Songs.collection();
-
-	        this.currentView = new SongsView({
-	            el: this.rootEl,
-	            collection: songs
-	        });
-
-	        songs.fetch({ remove: false });
-	    },
-	    addSong: function addSong() {
-	        if (this.currentView) {
-	            this.currentView.stopListening();
-	            this.currentView.undelegateEvents();
-	        }
-	        var songs = Songs.collection();
-
-	        this.currentView = new SongForm({
-	            el: this.rootEl,
-	            collection: songs
-	        });
-	    }
+	    index: controller.index,
+	    addSong: controller.addSong
 	});
 
 	new App();
@@ -201,7 +173,7 @@
 	        this.collection = this.runFilter();
 	        this.collection = this.runSort(this.sort);
 
-	        this.render();
+	        this.renderChildren();
 	    },
 	    onSort: function onSort(ev) {
 	        this.collection = this.runSort({
@@ -211,7 +183,7 @@
 
 	        this.$(ev.currentTarget).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
 
-	        this.render();
+	        this.renderChildren();
 	    },
 	    onAdd: function onAdd() {
 	        this.onFilter();
@@ -414,11 +386,14 @@
 	};
 	var CollectionRender = {
 	    render: function render() {
-	        var _this = this;
-
 	        if (this.template) {
 	            this.$el.html(this.template());
 	        }
+	        this.renderChildren();
+	        return this;
+	    },
+	    renderChildren: function renderChildren() {
+	        var _this = this;
 
 	        var collectionRoot = this.$(this.collectionRoot) || this.$el;
 	        collectionRoot.empty();
@@ -476,6 +451,61 @@
 	JST.form = _.template("\n<div class=\"row\">\n    <h2 class=\"col-sm-12\">Add a new song</h2>\n    <form class=\"col-sm-12\">\n        <div class=\"form-group\">\n            <label for=\"author\">Author</label>\n            <input type=\"text\" name=\"author\" id=\"author\" class=\"form-control\" value=\"<%= author %>\"/>\n        </div>\n\n        <div class=\"form-group\">\n            <label for=\"title\">Title</label>\n            <input type=\"text\" name=\"title\" id=\"title\" class=\"form-control\" value=\"<%= title %>\"/>\n        </div>\n        <div class=\"form-group\">\n            <button type=\"submit\" class=\"btn btn-success\">Submit</button>\n            <a href=\"#/\" type=\"submit\" class=\"btn btn-default\">Back</a>\n        </div>\n    </form>\n</div>\n");
 
 	module.exports = JST;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var Songs = _interopRequire(__webpack_require__(11));
+
+	var SongsView = _interopRequire(__webpack_require__(3));
+
+	var SongForm = _interopRequire(__webpack_require__(4));
+
+	var AppController = (function () {
+	    var currentView, rootEl;
+	    rootEl = "#root";
+
+	    function clear(view) {
+	        if (view) {
+	            view.stopListening();
+	            view.undelegateEvents();
+	        }
+	    }
+
+	    function index() {
+	        clear(currentView);
+	        var songs = Songs.collection();
+
+	        currentView = new SongsView({
+	            el: rootEl,
+	            collection: songs
+	        });
+
+	        songs.fetch({ remove: false });
+	    }
+
+	    function addSong() {
+	        clear(currentView);
+	        var songs = Songs.collection();
+
+	        currentView = new SongForm({
+	            el: rootEl,
+	            collection: songs
+	        });
+	    }
+
+	    return {
+	        index: index,
+	        addSong: addSong
+	    };
+	})();
+
+	module.exports = AppController;
 
 /***/ }
 /******/ ]);

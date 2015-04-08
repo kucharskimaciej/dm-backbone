@@ -36,7 +36,7 @@ var SongsView = Backbone.View.extend({
         this.collection = this.runFilter();
         this.collection = this.runSort(this.sort);
 
-        this.render();
+        this.renderChildren();
     },
     onSort: function (ev) {
         this.collection = this.runSort({
@@ -48,7 +48,7 @@ var SongsView = Backbone.View.extend({
             .toggleClass(this.sortUpIcon)
             .toggleClass(this.sortDownIcon);
 
-        this.render();
+        this.renderChildren();
     },
     onAdd: function () {
         this.onFilter();
