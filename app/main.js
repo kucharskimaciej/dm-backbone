@@ -98,8 +98,7 @@ var SongsView = Backbone.View.extend({
     }
 });
 
-var NewSongView = Backbone.View.extend({
-    el: '#newSong',
+var FormView = Backbone.View.extend({
     events: {
         'submit form': 'onSubmit'
     },
@@ -161,7 +160,8 @@ new SongsView({
     collection: metalSongs
 });
 
-new NewSongView({
+new FormView({
+    el: '#newSong',
     collection: metalSongs,
     template: _.template( $('#newSongForm').html() )
 });
