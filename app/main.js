@@ -100,25 +100,28 @@ var SongsView = Backbone.View.extend({
 
 var NewSongView = Backbone.View.extend({
     el: '#newSong',
-    template: _.template( $('#newSongForm').html() ),
     events: {
         'submit form': 'onSubmit'
     },
     getModel: function () {
       return new this.collection.model;
     },
-    initialize: function () {
+    initialize: function (opts) {
+        this.template = opts.template;
         this.model = this.getModel();
         this.render();
+    },
+    serialize: function () {
+        var serialized = {};
+        this.$('input, textarea, select').each(function (index, el) {
+            serialized[el.getAttribute('name')] = el.value;
+        });
+        return serialized;
     },
     onSubmit: function (ev) {
         ev.preventDefault();
 
-        // serialize
-        this.model.set({
-            author: this.$('[name=author]').val(),
-            title: this.$('[name=title]').val()
-        });
+        this.model.set(this.serialize());
 
         this.collection.add(this.model);
         this.model = this.getModel();
@@ -159,5 +162,6 @@ new SongsView({
 });
 
 new NewSongView({
-    collection: metalSongs
+    collection: metalSongs,
+    template: _.template( $('#newSongForm').html() )
 });
