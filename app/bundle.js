@@ -48,13 +48,13 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var Songs = _interopRequire(__webpack_require__(2));
+	var Songs = _interopRequire(__webpack_require__(11));
 
 	var SongsView = _interopRequire(__webpack_require__(3));
 
 	var SongForm = _interopRequire(__webpack_require__(4));
 
-	var metalSongs = new Songs();
+	var metalSongs = Songs.collection();
 	metalSongs.fetch();
 
 	new SongsView({
@@ -401,6 +401,30 @@
 	    item: ItemRender,
 	    collection: CollectionRender
 	};
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var Songs = _interopRequire(__webpack_require__(2));
+
+	var SongsResource = (function () {
+	    var metalSongs;
+
+	    metalSongs = new Songs();
+
+	    return {
+	        collection: function collection() {
+	            return metalSongs;
+	        }
+	    };
+	})();
+
+	module.exports = SongsResource;
 
 /***/ }
 /******/ ]);

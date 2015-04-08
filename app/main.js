@@ -1,9 +1,9 @@
-import Songs from './collections/Songs.js';
+import Songs from './resources/Songs.js';
 import SongsView from './views/Songs.js';
 import SongForm from './views/SongForm.js';
 
 
-var metalSongs = new Songs();
+var metalSongs = Songs.collection();
 metalSongs.fetch();
 
 new SongsView({
@@ -15,4 +15,3 @@ new SongForm({
     collection: metalSongs,
     template: _.template( $('#newSongForm').html() )
 });
-
