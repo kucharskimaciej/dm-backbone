@@ -60,6 +60,14 @@
 	            required: true,
 	            msg: "You must provide the author"
 	        }
+	    },
+	    parse: function parse(attr) {
+	        return {
+	            author: attr.artistName,
+	            title: attr.trackName,
+	            id: attr.trackId,
+	            price: attr.trackPrice
+	        };
 	    }
 
 	});
@@ -81,6 +89,10 @@
 	            models = models.reverse();
 	        }
 	        return new SongsCollection(models);
+	    },
+	    url: "http://itunes.apple.com/search?term=metal&media=music&limit=10",
+	    parse: function parse(res) {
+	        return res.results;
 	    }
 	});
 
@@ -231,22 +243,9 @@
 	    }
 	});
 
-	var metalSongs = new SongsCollection([{
-	    author: "Megadeth",
-	    title: "Ace of Spades"
-	}, {
-	    author: "Metallica",
-	    title: "For Whom The Bell Tolls"
-	}, {
-	    author: "Satyricon",
-	    title: "K.I.N.G"
-	}, {
-	    author: "Alice Cooper",
-	    title: "Poison"
-	}, {
-	    author: "Ron James Dio",
-	    title: "Holy diver"
-	}]);
+	var metalSongs = new SongsCollection();
+	metalSongs.fetch();
+
 	new SongsView({
 	    collection: metalSongs
 	});
