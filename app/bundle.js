@@ -46,6 +46,33 @@
 
 	"use strict";
 
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var Songs = _interopRequire(__webpack_require__(2));
+
+	var SongsView = _interopRequire(__webpack_require__(3));
+
+	var SongForm = _interopRequire(__webpack_require__(4));
+
+	var metalSongs = new Songs();
+	metalSongs.fetch();
+
+	new SongsView({
+	    collection: metalSongs
+	});
+
+	new SongForm({
+	    el: "#newSong",
+	    collection: metalSongs,
+	    template: _.template($("#newSongForm").html())
+	});
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
 	var Song = Backbone.Model.extend({
 	    defaults: {
 	        author: "Unknown Artist",
@@ -72,6 +99,18 @@
 
 	});
 
+	module.exports = Song;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var Song = _interopRequire(__webpack_require__(1));
+
 	var SongsCollection = Backbone.Collection.extend({
 	    model: Song,
 	    runFilter: function runFilter(predicate) {
@@ -96,15 +135,17 @@
 	    }
 	});
 
-	var SongView = Backbone.View.extend({
-	    tagName: "li",
-	    className: "list-group-item",
-	    template: _.template("<strong><%= author %></strong> - <%= title %>"),
-	    render: function render() {
-	        this.$el.html(this.template(this.model.attributes));
-	        return this;
-	    }
-	});
+	module.exports = SongsCollection;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var SongView = _interopRequire(__webpack_require__(5));
 
 	var SongsView = Backbone.View.extend({
 	    el: "#songs",
@@ -168,6 +209,50 @@
 	        this.onFilter();
 	    }
 	});
+
+	module.exports = SongsView;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var FormView = _interopRequire(__webpack_require__(6));
+
+	var SongForm = FormView.extend({
+	    submitCallback: function submitCallback(view, model, collection) {
+	        collection.add(model);
+	    }
+	});
+
+	module.exports = SongForm;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var SongView = Backbone.View.extend({
+	    tagName: "li",
+	    className: "list-group-item",
+	    template: _.template("<strong><%= author %></strong> - <%= title %>"),
+	    render: function render() {
+	        this.$el.html(this.template(this.model.attributes));
+	        return this;
+	    }
+	});
+
+	module.exports = SongView;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 
 	var FormView = Backbone.View.extend({
 	    events: {
@@ -237,24 +322,7 @@
 	    }
 	});
 
-	var SongForm = FormView.extend({
-	    submitCallback: function submitCallback(view, model, collection) {
-	        collection.add(model);
-	    }
-	});
-
-	var metalSongs = new SongsCollection();
-	metalSongs.fetch();
-
-	new SongsView({
-	    collection: metalSongs
-	});
-
-	new SongForm({
-	    el: "#newSong",
-	    collection: metalSongs,
-	    template: _.template($("#newSongForm").html())
-	});
+	module.exports = FormView;
 
 	//
 
