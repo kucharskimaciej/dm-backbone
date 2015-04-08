@@ -49,6 +49,7 @@ var SongsView = Backbone.View.extend({
     sortDownIcon: 'glyphicon-chevron-down',
     initialize: function () {
         this._collection = this.collection;
+        this.listenTo(this._collection, 'add', this.onAdd);
         this.render();
     },
     render: function () {
@@ -91,6 +92,27 @@ var SongsView = Backbone.View.extend({
             .toggleClass(this.sortDownIcon);
 
         this.render();
+    },
+    onAdd: function () {
+        this.onFilter();
+    }
+});
+
+var NewSongView = Backbone.View.extend({
+    el: '#newSong',
+    events: {
+        'submit': 'onSubmit'
+    },
+    onSubmit: function (ev) {
+        ev.preventDefault();
+
+        // serialize
+        var song = {
+            author: this.$('[name=author]').val(),
+            title: this.$('[name=title]').val()
+        };
+
+        this.collection.add(song);
     }
 });
 
@@ -118,5 +140,9 @@ var metalSongs = new SongsCollection([
     }
 ]);
 new SongsView({
+    collection: metalSongs
+});
+
+new NewSongView({
     collection: metalSongs
 });

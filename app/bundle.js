@@ -97,6 +97,7 @@
 	    sortDownIcon: "glyphicon-chevron-down",
 	    initialize: function initialize() {
 	        this._collection = this.collection;
+	        this.listenTo(this._collection, "add", this.onAdd);
 	        this.render();
 	    },
 	    render: function render() {
@@ -139,6 +140,27 @@
 	        this.$(ev.currentTarget).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
 
 	        this.render();
+	    },
+	    onAdd: function onAdd() {
+	        this.onFilter();
+	    }
+	});
+
+	var NewSongView = Backbone.View.extend({
+	    el: "#newSong",
+	    events: {
+	        submit: "onSubmit"
+	    },
+	    onSubmit: function onSubmit(ev) {
+	        ev.preventDefault();
+
+	        // serialize
+	        var song = {
+	            author: this.$("[name=author]").val(),
+	            title: this.$("[name=title]").val()
+	        };
+
+	        this.collection.add(song);
 	    }
 	});
 
@@ -159,6 +181,10 @@
 	    title: "Holy diver"
 	}]);
 	new SongsView({
+	    collection: metalSongs
+	});
+
+	new NewSongView({
 	    collection: metalSongs
 	});
 
