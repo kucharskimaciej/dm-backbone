@@ -238,6 +238,9 @@
 	    template: JST.form,
 	    submitCallback: function submitCallback(view, model, collection) {
 	        collection.add(model);
+	        window.setTimeout(function () {
+	            Backbone.history.navigate("", { trigger: true });
+	        }, 0);
 	    }
 	});
 

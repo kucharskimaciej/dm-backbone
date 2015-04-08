@@ -5,6 +5,9 @@ var SongForm = FormView.extend({
     template: JST['form'],
     submitCallback: function (view, model, collection) {
         collection.add(model);
+        window.setTimeout(function () {
+            Backbone.history.navigate('', { trigger: true });
+        }, 0);
     }
 });
 
