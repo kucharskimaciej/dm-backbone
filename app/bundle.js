@@ -89,7 +89,7 @@
 	        "keyup #filter": "onFilter",
 	        "click [action=sort]": "onSort"
 	    },
-	    filter: {
+	    sort: {
 	        by: "author",
 	        desc: false
 	    },
@@ -113,20 +113,28 @@
 
 	        return this;
 	    },
-	    onFilter: function onFilter() {
+	    runFilter: function runFilter() {
 	        var filter;
 	        filter = this.$("#filter").val().toLowerCase();
-	        this.collection = this._collection.runFilter(filter);
+
+	        return this._collection.runFilter(filter);
+	    },
+	    runSort: function runSort(sort) {
+	        this.sort = sort;
+
+	        return this.collection.runSort(this.sort.by, this.sort.desc);
+	    },
+	    onFilter: function onFilter() {
+	        this.collection = this.runFilter();
+	        this.collection = this.runSort(this.sort);
 
 	        this.render();
 	    },
 	    onSort: function onSort(ev) {
-	        this.filter = {
+	        this.collection = this.runSort({
 	            by: this.$(ev.currentTarget).attr("by"),
-	            desc: !this.filter.desc
-	        };
-
-	        this.collection = this.collection.runSort(this.filter.by, this.filter.desc);
+	            desc: !this.sort.desc
+	        });
 
 	        this.$(ev.currentTarget).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
 

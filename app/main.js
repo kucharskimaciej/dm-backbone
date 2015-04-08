@@ -41,7 +41,7 @@ var SongsView = Backbone.View.extend({
         'keyup #filter': 'onFilter',
         'click [action=sort]': 'onSort'
     },
-    filter: {
+    sort: {
         by: 'author',
         desc: false
     },
@@ -63,20 +63,28 @@ var SongsView = Backbone.View.extend({
 
         return this;
     },
-    onFilter: function () {
+    runFilter: function () {
         var filter;
         filter = this.$('#filter').val().toLowerCase();
-        this.collection = this._collection.runFilter(filter);
+
+        return this._collection.runFilter(filter);
+    },
+    runSort: function (sort) {
+        this.sort = sort;
+
+        return this.collection.runSort(this.sort.by, this.sort.desc);
+    },
+    onFilter: function () {
+        this.collection = this.runFilter();
+        this.collection = this.runSort(this.sort);
 
         this.render();
     },
     onSort: function (ev) {
-        this.filter = {
+        this.collection = this.runSort({
             by: this.$(ev.currentTarget).attr('by'),
-            desc: !this.filter.desc
-        };
-
-        this.collection = this.collection.runSort(this.filter.by, this.filter.desc);
+            desc: !this.sort.desc
+        });
 
         this.$(ev.currentTarget).find('.glyphicon')
             .toggleClass(this.sortUpIcon)
