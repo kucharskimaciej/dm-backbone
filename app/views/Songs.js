@@ -1,8 +1,9 @@
+import JST from '../templates.js';
 import SongView from './Song.js';
 import Render from '../mixins/Render.js';
 
 var SongsView = Backbone.View.extend({
-    el: '#songs',
+    template: JST['songs'],
     events: {
         'keyup #filter': 'onFilter',
         'click [action=sort]': 'onSort'

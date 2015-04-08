@@ -14,7 +14,6 @@ var FormView = Backbone.View.extend({
     },
 
     initialize: function (opts) {
-        this.template = opts.template;
         this.submitCallback = opts.submitCallback || this.submitCallback;
         this.resetModel();
         this.render();

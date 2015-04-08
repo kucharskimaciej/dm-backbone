@@ -54,18 +54,44 @@
 
 	var SongForm = _interopRequire(__webpack_require__(4));
 
-	var metalSongs = Songs.collection();
-	metalSongs.fetch();
+	var App = Backbone.Router.extend({
+	    rootEl: "#root",
+	    currentView: null,
+	    routes: {
+	        "": "index",
+	        add: "addSong"
+	    },
 
-	new SongsView({
-	    collection: metalSongs
+	    index: function index() {
+	        if (this.currentView) {
+	            this.currentView.stopListening();
+	            this.currentView.undelegateEvents();
+	        }
+	        var songs = Songs.collection();
+
+	        this.currentView = new SongsView({
+	            el: this.rootEl,
+	            collection: songs
+	        });
+
+	        songs.fetch({ remove: false });
+	    },
+	    addSong: function addSong() {
+	        if (this.currentView) {
+	            this.currentView.stopListening();
+	            this.currentView.undelegateEvents();
+	        }
+	        var songs = Songs.collection();
+
+	        this.currentView = new SongForm({
+	            el: this.rootEl,
+	            collection: songs
+	        });
+	    }
 	});
 
-	new SongForm({
-	    el: "#newSong",
-	    collection: metalSongs,
-	    template: _.template($("#newSongForm").html())
-	});
+	new App();
+	Backbone.history.start();
 
 /***/ },
 /* 1 */
@@ -135,12 +161,14 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+	var JST = _interopRequire(__webpack_require__(12));
+
 	var SongView = _interopRequire(__webpack_require__(5));
 
 	var Render = _interopRequire(__webpack_require__(10));
 
 	var SongsView = Backbone.View.extend({
-	    el: "#songs",
+	    template: JST.songs,
 	    events: {
 	        "keyup #filter": "onFilter",
 	        "click [action=sort]": "onSort"
@@ -202,9 +230,12 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+	var JST = _interopRequire(__webpack_require__(12));
+
 	var FormView = _interopRequire(__webpack_require__(6));
 
 	var SongForm = FormView.extend({
+	    template: JST.form,
 	    submitCallback: function submitCallback(view, model, collection) {
 	        collection.add(model);
 	    }
@@ -257,7 +288,6 @@
 	    },
 
 	    initialize: function initialize(opts) {
-	        this.template = opts.template;
 	        this.submitCallback = opts.submitCallback || this.submitCallback;
 	        this.resetModel();
 	        this.render();
@@ -383,6 +413,10 @@
 	    render: function render() {
 	        var _this = this;
 
+	        if (this.template) {
+	            this.$el.html(this.template());
+	        }
+
 	        var collectionRoot = this.$(this.collectionRoot) || this.$el;
 	        collectionRoot.empty();
 	        this.collection.forEach(function (item) {
@@ -425,6 +459,20 @@
 	})();
 
 	module.exports = SongsResource;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var JST = {};
+
+	JST.songs = _.template("\n<div class=\"row\">\n    <div class=\"col-sm-12\">\n        <h1>Hello Backbone <a href=\"#/add\" class=\"btn btn-default pull-right\">Add new song</a></h1>\n\n        <div class=\"row\">\n            <div class=\"col-sm-12\">\n                <button action=\"sort\" by=\"author\" class=\"btn btn-default\">\n                    <i class=\"glyphicon glyphicon-chevron-down\"></i>\n                    Author\n                </button>\n                <button action=\"sort\" by=\"title\" class=\"btn btn-default\">\n                    <i class=\"glyphicon glyphicon-chevron-down\"></i>\n                    Title\n                </button>\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"col-sm-12\">\n                <input class=\"form-control\" type=\"text\" id=\"filter\" placeholder=\"Filter...\"/>\n            </div>\n        </div>\n        <ul class=\"list-group\"></ul>\n    </div>\n</div>\n");
+
+	JST.form = _.template("\n<div class=\"row\">\n    <h2 class=\"col-sm-12\">Add a new song</h2>\n    <form class=\"col-sm-12\">\n        <div class=\"form-group\">\n            <label for=\"author\">Author</label>\n            <input type=\"text\" name=\"author\" id=\"author\" class=\"form-control\" value=\"<%= author %>\"/>\n        </div>\n\n        <div class=\"form-group\">\n            <label for=\"title\">Title</label>\n            <input type=\"text\" name=\"title\" id=\"title\" class=\"form-control\" value=\"<%= title %>\"/>\n        </div>\n        <div class=\"form-group\">\n            <button type=\"submit\" class=\"btn btn-success\">Submit</button>\n            <a href=\"#/\" type=\"submit\" class=\"btn btn-default\">Back</a>\n        </div>\n    </form>\n</div>\n");
+
+	module.exports = JST;
 
 /***/ }
 /******/ ]);

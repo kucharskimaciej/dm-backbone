@@ -6,6 +6,10 @@ var ItemRender = {
 };
 var CollectionRender = {
     render: function () {
+        if(this.template) {
+            this.$el.html(this.template());
+        }
+
         var collectionRoot = this.$(this.collectionRoot) || this.$el;
         collectionRoot.empty();
         this.collection.forEach((item) => {

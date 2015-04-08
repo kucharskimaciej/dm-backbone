@@ -6,48 +6,8 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
 </head>
 <body class="container">
-    <div class="row">
-        <div class="col-sm-12" id="songs">
-            <h1>Hello Backbone</h1>
+    <section id="root"></section>
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <button action="sort" by="author" class="btn btn-default">
-                        <i class="glyphicon glyphicon-chevron-down"></i>
-                        Author
-                    </button>
-                    <button action="sort" by="title" class="btn btn-default">
-                        <i class="glyphicon glyphicon-chevron-down"></i>
-                        Title
-                    </button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <input class="form-control" type="text" id="filter" placeholder="Filter..."/>
-                </div>
-            </div>
-            <ul class="list-group"></ul>
-        </div>
-        <div class="col-sm-12" id="newSong"></div>
-    </div>
-    <script type="template" id="newSongForm">
-        <h2>Add a new song</h2>
-        <form>
-            <div class="form-group">
-                <label for="author">Author</label>
-                <input type="text" name="author" id="author" class="form-control" value="<%= author %>"/>
-            </div>
-
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" name="title" id="title" class="form-control" value="<%= title %>"/>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-submit">Submit</button>
-            </div>
-        </form>
-    </script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
