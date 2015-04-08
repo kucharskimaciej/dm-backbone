@@ -125,13 +125,6 @@ var FormView = Backbone.View.extend({
         this.model = this.getModel();
         this.render();
     },
-    serialize: function () {
-        var serialized = {};
-        this.$('input, textarea, select').each(function (index, el) {
-            serialized[el.getAttribute('name')] = el.value;
-        });
-        return serialized;
-    },
     clearErrors: function () {
         this.$('.help-block').remove();
         this.$('.form-group').removeClass('has-error');
@@ -148,7 +141,7 @@ var FormView = Backbone.View.extend({
     },
     runValidation: function () {
         this.clearErrors();
-        this.model.set(this.serialize());
+        this.model.set(Backbone.Syphon.serialize(this));
 
         if(!this.model.isValid()) {
             this.showErrors(this.model.validationError);

@@ -173,13 +173,6 @@
 	        this.model = this.getModel();
 	        this.render();
 	    },
-	    serialize: function serialize() {
-	        var serialized = {};
-	        this.$("input, textarea, select").each(function (index, el) {
-	            serialized[el.getAttribute("name")] = el.value;
-	        });
-	        return serialized;
-	    },
 	    clearErrors: function clearErrors() {
 	        this.$(".help-block").remove();
 	        this.$(".form-group").removeClass("has-error");
@@ -196,7 +189,7 @@
 	    },
 	    runValidation: function runValidation() {
 	        this.clearErrors();
-	        this.model.set(this.serialize());
+	        this.model.set(Backbone.Syphon.serialize(this));
 
 	        if (!this.model.isValid()) {
 	            this.showErrors(this.model.validationError);
