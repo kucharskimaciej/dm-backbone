@@ -137,6 +137,8 @@
 
 	var SongView = _interopRequire(__webpack_require__(5));
 
+	var Render = _interopRequire(__webpack_require__(10));
+
 	var SongsView = Backbone.View.extend({
 	    el: "#songs",
 	    events: {
@@ -154,20 +156,8 @@
 	        this.listenTo(this._collection, "add", this.onAdd);
 	        this.render();
 	    },
-	    render: function render() {
-	        var _this = this;
-
-	        this.$("ul").empty();
-	        this.collection.forEach(function (song) {
-	            var view = new SongView({
-	                model: song
-	            });
-
-	            _this.$("ul").append(view.render().el);
-	        });
-
-	        return this;
-	    },
+	    collectionRoot: "ul",
+	    modelView: SongView,
 	    runFilter: function runFilter() {
 	        var filter;
 	        filter = this.$("#filter").val().toLowerCase();
@@ -200,6 +190,8 @@
 	    }
 	});
 
+	_.extend(SongsView.prototype, Render.collection);
+
 	module.exports = SongsView;
 
 /***/ },
@@ -226,6 +218,10 @@
 
 	"use strict";
 
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var Render = _interopRequire(__webpack_require__(10));
+
 	var SongView = Backbone.View.extend({
 	    tagName: "li",
 	    className: "list-group-item",
@@ -235,6 +231,8 @@
 	        return this;
 	    }
 	});
+
+	_.extend(SongView.prototype, Render.item);
 
 	module.exports = SongView;
 
@@ -247,6 +245,8 @@
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 	var Validation = _interopRequire(__webpack_require__(9));
+
+	var Render = _interopRequire(__webpack_require__(10));
 
 	var FormView = Backbone.View.extend({
 	    events: {
@@ -280,14 +280,11 @@
 	    },
 	    submitCallback: function submitCallback() {
 	        console.warn("no submit callback provided");
-	    },
-	    render: function render() {
-	        this.$el.html(this.template(this.model.attributes));
-	        return this;
 	    }
 	});
 
 	_.defaults(FormView.prototype, Validation);
+	_.extend(FormView.prototype, Render.item);
 
 	module.exports = FormView;
 
@@ -373,6 +370,41 @@
 	module.exports = ValidationMixin;
 
 	//
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var ItemRender = {
+	    render: function render() {
+	        this.$el.html(this.template(this.model.attributes));
+	        return this;
+	    }
+	};
+	var CollectionRender = {
+	    render: function render() {
+	        var _this = this;
+
+	        var collectionRoot = this.$(this.collectionRoot) || this.$el;
+	        collectionRoot.empty();
+	        this.collection.forEach(function (item) {
+	            var view = new _this.modelView({
+	                model: item
+	            });
+
+	            collectionRoot.append(view.render().el);
+	        });
+
+	        return this;
+	    }
+	};
+
+	module.exports = {
+	    item: ItemRender,
+	    collection: CollectionRender
+	};
 
 /***/ }
 /******/ ]);

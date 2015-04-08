@@ -1,3 +1,5 @@
+import Render from '../mixins/Render.js';
+
 var SongView = Backbone.View.extend({
     tagName: 'li',
     className: 'list-group-item',
@@ -7,5 +9,7 @@ var SongView = Backbone.View.extend({
         return this;
     }
 });
+
+_.extend(SongView.prototype, Render.item);
 
 module.exports = SongView;

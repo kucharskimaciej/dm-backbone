@@ -1,4 +1,5 @@
 import SongView from './Song.js';
+import Render from '../mixins/Render.js';
 
 var SongsView = Backbone.View.extend({
     el: '#songs',
@@ -17,18 +18,8 @@ var SongsView = Backbone.View.extend({
         this.listenTo(this._collection, 'add', this.onAdd);
         this.render();
     },
-    render: function () {
-        this.$('ul').empty();
-        this.collection.forEach((song) => {
-            var view = new SongView({
-                model: song
-            });
-
-            this.$('ul').append(view.render().el);
-        });
-
-        return this;
-    },
+    collectionRoot: 'ul',
+    modelView: SongView,
     runFilter: function () {
         var filter;
         filter = this.$('#filter').val().toLowerCase();
@@ -62,5 +53,7 @@ var SongsView = Backbone.View.extend({
         this.onFilter();
     }
 });
+
+_.extend(SongsView.prototype, Render.collection);
 
 module.exports = SongsView;

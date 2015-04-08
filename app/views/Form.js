@@ -1,4 +1,5 @@
 import Validation from '../mixins/Validations.js';
+import Render from '../mixins/Render.js';
 
 var FormView = Backbone.View.extend({
     events: {
@@ -32,13 +33,10 @@ var FormView = Backbone.View.extend({
     },
     submitCallback: function () {
         console.warn('no submit callback provided');
-    },
-    render: function () {
-        this.$el.html(this.template(this.model.attributes));
-        return this;
     }
 });
 
 _.defaults(FormView.prototype, Validation);
+_.extend(FormView.prototype, Render.item);
 
 module.exports = FormView;
