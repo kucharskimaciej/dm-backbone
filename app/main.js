@@ -100,19 +100,34 @@ var SongsView = Backbone.View.extend({
 
 var NewSongView = Backbone.View.extend({
     el: '#newSong',
+    template: _.template( $('#newSongForm').html() ),
     events: {
-        'submit': 'onSubmit'
+        'submit form': 'onSubmit'
+    },
+    getModel: function () {
+      return new this.collection.model;
+    },
+    initialize: function () {
+        this.model = this.getModel();
+        this.render();
     },
     onSubmit: function (ev) {
         ev.preventDefault();
 
         // serialize
-        var song = {
+        this.model.set({
             author: this.$('[name=author]').val(),
             title: this.$('[name=title]').val()
-        };
+        });
 
-        this.collection.add(song);
+        this.collection.add(this.model);
+        this.model = this.getModel();
+
+        this.render();
+    },
+    render: function () {
+        this.$el.html(this.template(this.model.attributes));
+        return this;
     }
 });
 
