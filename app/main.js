@@ -115,6 +115,10 @@ var FormView = Backbone.View.extend({
         'keyup form': 'runValidation'
     },
     resetModel: function () {
+        if(this.model) {
+            Backbone.Validation.unbind(this, { model: this.model });
+        }
+
         this.model = new this.collection.model;
         Backbone.Validation.bind(this, {
             model: this.model,
@@ -130,6 +134,7 @@ var FormView = Backbone.View.extend({
     },
     initialize: function (opts) {
         this.template = opts.template;
+        this.submitCallback = opts.submitCallback || this.submitCallback;
         this.resetModel();
         this.render();
     },
@@ -160,10 +165,13 @@ var FormView = Backbone.View.extend({
             return;
         }
 
-        this.collection.add(this.model);
+        this.submitCallback(this, this.model, this.collection);
 
         this.resetModel();
         this.render();
+    },
+    submitCallback: function () {
+      console.warn('no submit callback provided');
     },
     render: function () {
         this.$el.html(this.template(this.model.attributes));
@@ -171,6 +179,11 @@ var FormView = Backbone.View.extend({
     }
 });
 
+var SongForm = FormView.extend({
+   submitCallback: function (view, model, collection) {
+       collection.add(model);
+   }
+});
 
 var metalSongs = new SongsCollection([
     {
@@ -198,7 +211,7 @@ new SongsView({
     collection: metalSongs
 });
 
-new FormView({
+new SongForm({
     el: '#newSong',
     collection: metalSongs,
     template: _.template( $('#newSongForm').html() )

@@ -163,6 +163,10 @@
 	        "keyup form": "runValidation"
 	    },
 	    resetModel: function resetModel() {
+	        if (this.model) {
+	            Backbone.Validation.unbind(this, { model: this.model });
+	        }
+
 	        this.model = new this.collection.model();
 	        Backbone.Validation.bind(this, {
 	            model: this.model,
@@ -176,6 +180,7 @@
 	    },
 	    initialize: function initialize(opts) {
 	        this.template = opts.template;
+	        this.submitCallback = opts.submitCallback || this.submitCallback;
 	        this.resetModel();
 	        this.render();
 	    },
@@ -206,14 +211,23 @@
 	            return;
 	        }
 
-	        this.collection.add(this.model);
+	        this.submitCallback(this, this.model, this.collection);
 
 	        this.resetModel();
 	        this.render();
 	    },
+	    submitCallback: function submitCallback() {
+	        console.warn("no submit callback provided");
+	    },
 	    render: function render() {
 	        this.$el.html(this.template(this.model.attributes));
 	        return this;
+	    }
+	});
+
+	var SongForm = FormView.extend({
+	    submitCallback: function submitCallback(view, model, collection) {
+	        collection.add(model);
 	    }
 	});
 
@@ -237,7 +251,7 @@
 	    collection: metalSongs
 	});
 
-	new FormView({
+	new SongForm({
 	    el: "#newSong",
 	    collection: metalSongs,
 	    template: _.template($("#newSongForm").html())
