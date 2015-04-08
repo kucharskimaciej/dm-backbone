@@ -111,29 +111,19 @@
 
 	var Song = _interopRequire(__webpack_require__(1));
 
+	var Sortable = _interopRequire(__webpack_require__(7));
+
+	var Filterable = _interopRequire(__webpack_require__(8));
+
 	var SongsCollection = Backbone.Collection.extend({
 	    model: Song,
-	    runFilter: function runFilter(predicate) {
-	        var models;
-	        models = this.filter(function (item) {
-	            return JSON.stringify(item).toLowerCase().indexOf(predicate) != -1;
-	        });
-
-	        return new SongsCollection(models);
-	    },
-	    runSort: function runSort(what, desc) {
-	        var models;
-	        models = this.sortBy(what);
-	        if (desc) {
-	            models = models.reverse();
-	        }
-	        return new SongsCollection(models);
-	    },
 	    url: "http://itunes.apple.com/search?term=metal&media=music&limit=10",
 	    parse: function parse(res) {
 	        return res.results;
 	    }
 	});
+
+	_.defaults(SongsCollection.prototype, Sortable, Filterable);
 
 	module.exports = SongsCollection;
 
@@ -325,6 +315,40 @@
 	module.exports = FormView;
 
 	//
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	    runSort: function runSort(what, desc) {
+	        var models;
+	        models = this.sortBy(what);
+	        if (desc) {
+	            models = models.reverse();
+	        }
+	        return new this.constructor(models);
+	    }
+	};
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	    runFilter: function runFilter(predicate) {
+	        var models;
+	        models = this.filter(function (item) {
+	            return JSON.stringify(item).toLowerCase().indexOf(predicate) != -1;
+	        });
+
+	        return new this.constructor(models);
+	    }
+	};
 
 /***/ }
 /******/ ]);
