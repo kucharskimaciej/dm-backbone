@@ -2,43 +2,26 @@ import Songs from './resources/Songs.js';
 import SongsView from './views/Songs.js';
 import SongForm from './views/SongForm.js';
 
-var AppController = (function () {
-    var currentView, rootEl;
-    rootEl = '#root';
+var AppController = Marionette.Controller.extend({
 
-    function clear(view) {
-        if(view) {
-            view.stopListening();
-            view.undelegateEvents();
-        }
-    }
-
-    function index () {
-        clear(currentView);
+    index: function index () {
         var songs = Songs.collection();
-
-        currentView = new SongsView({
-            el: rootEl,
+        var view = new SongsView({
             collection: songs
         });
 
+        window.App.root.show(view);
         songs.fetch({ remove: false });
-    }
-
-    function addSong () {
-        clear(currentView);
+    },
+    addSong: function addSong () {
         var songs = Songs.collection();
 
-        currentView = new SongForm({
-            el: rootEl,
+        var view  = new SongForm({
             collection: songs
         });
-    }
 
-    return {
-        index: index,
-        addSong: addSong
-    };
-})();
+        window.App.root.show(view);
+    }
+});
 
 module.exports = AppController;
