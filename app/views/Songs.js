@@ -13,7 +13,7 @@ var SongsView = Marionette.CompositeView.extend({
         'click @ui.sortButton': 'onSort'
     },
     collectionEvents: {
-        'add' : 'onAdd'
+        'add' : 'onFilter'
     },
     sort: {
         by: 'author',
@@ -55,9 +55,6 @@ var SongsView = Marionette.CompositeView.extend({
             .toggleClass(this.sortDownIcon);
 
         this._renderChildren();
-    },
-    onAdd: function () {
-        this.onFilter();
     }
 });
 

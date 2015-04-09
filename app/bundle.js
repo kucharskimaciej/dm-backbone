@@ -48,7 +48,7 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var AppController = _interopRequire(__webpack_require__(1));
+	var AppController = _interopRequire(__webpack_require__(13));
 
 	window.App = new Marionette.Application();
 
@@ -78,37 +78,33 @@
 
 	"use strict";
 
-	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-	var Songs = _interopRequire(__webpack_require__(2));
-
-	var SongsView = _interopRequire(__webpack_require__(3));
-
-	var SongForm = _interopRequire(__webpack_require__(4));
-
-	var AppController = Marionette.Controller.extend({
-
-	    index: function index() {
-	        var songs = Songs.collection();
-	        var view = new SongsView({
-	            collection: songs
-	        });
-
-	        window.App.root.show(view);
-	        songs.fetch({ remove: false });
+	var Song = Backbone.Model.extend({
+	    defaults: {
+	        author: "Unknown Artist",
+	        title: "Unnamed Track"
 	    },
-	    addSong: function addSong() {
-	        var songs = Songs.collection();
-
-	        var view = new SongForm({
-	            collection: songs
-	        });
-
-	        window.App.root.show(view);
+	    validation: {
+	        title: {
+	            required: true,
+	            msg: "You must provide the title"
+	        },
+	        author: {
+	            required: true,
+	            msg: "You must provide the author"
+	        }
+	    },
+	    parse: function parse(attr) {
+	        return {
+	            author: attr.artistName,
+	            title: attr.trackName,
+	            id: attr.trackId,
+	            price: attr.trackPrice
+	        };
 	    }
+
 	});
 
-	module.exports = AppController;
+	module.exports = Song;
 
 /***/ },
 /* 2 */
@@ -118,21 +114,23 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var Songs = _interopRequire(__webpack_require__(5));
+	var Song = _interopRequire(__webpack_require__(1));
 
-	var SongsResource = (function () {
-	    var metalSongs;
+	var Sortable = _interopRequire(__webpack_require__(7));
 
-	    metalSongs = new Songs();
+	var Filterable = _interopRequire(__webpack_require__(8));
 
-	    return {
-	        collection: function collection() {
-	            return metalSongs;
-	        }
-	    };
-	})();
+	var SongsCollection = Backbone.Collection.extend({
+	    model: Song,
+	    url: "http://itunes.apple.com/search?term=metal&media=music&limit=10",
+	    parse: function parse(res) {
+	        return res.results;
+	    }
+	});
 
-	module.exports = SongsResource;
+	_.defaults(SongsCollection.prototype, Sortable, Filterable);
+
+	module.exports = SongsCollection;
 
 /***/ },
 /* 3 */
@@ -142,11 +140,11 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var JST = _interopRequire(__webpack_require__(6));
+	var JST = _interopRequire(__webpack_require__(12));
 
-	var SongView = _interopRequire(__webpack_require__(8));
+	var SongView = _interopRequire(__webpack_require__(5));
 
-	var Render = _interopRequire(__webpack_require__(9));
+	var Render = _interopRequire(__webpack_require__(10));
 
 	var SongsView = Marionette.CompositeView.extend({
 	    template: JST.songs,
@@ -159,7 +157,7 @@
 	        "click @ui.sortButton": "onSort"
 	    },
 	    collectionEvents: {
-	        add: "onAdd"
+	        add: "onFilter"
 	    },
 	    sort: {
 	        by: "author",
@@ -199,9 +197,6 @@
 	        this.$(ev.currentTarget).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
 
 	        this._renderChildren();
-	    },
-	    onAdd: function onAdd() {
-	        this.onFilter();
 	    }
 	});
 
@@ -215,9 +210,9 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var JST = _interopRequire(__webpack_require__(6));
+	var JST = _interopRequire(__webpack_require__(12));
 
-	var FormView = _interopRequire(__webpack_require__(7));
+	var FormView = _interopRequire(__webpack_require__(6));
 
 	var SongForm = FormView.extend({
 	    template: JST.form,
@@ -239,23 +234,15 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var Song = _interopRequire(__webpack_require__(11));
+	var Render = _interopRequire(__webpack_require__(10));
 
-	var Sortable = _interopRequire(__webpack_require__(12));
-
-	var Filterable = _interopRequire(__webpack_require__(13));
-
-	var SongsCollection = Backbone.Collection.extend({
-	    model: Song,
-	    url: "http://itunes.apple.com/search?term=metal&media=music&limit=10",
-	    parse: function parse(res) {
-	        return res.results;
-	    }
+	var SongView = Marionette.ItemView.extend({
+	    tagName: "li",
+	    className: "list-group-item",
+	    template: _.template("<strong><%= author %></strong> - <%= title %>")
 	});
 
-	_.defaults(SongsCollection.prototype, Sortable, Filterable);
-
-	module.exports = SongsCollection;
+	module.exports = SongView;
 
 /***/ },
 /* 6 */
@@ -263,25 +250,11 @@
 
 	"use strict";
 
-	var JST = {};
-
-	JST.songs = _.template("\n<div class=\"row\">\n    <div class=\"col-sm-12\">\n        <h1>Hello Backbone <a href=\"#/add\" class=\"btn btn-default pull-right\">Add new song</a></h1>\n\n        <div class=\"row\">\n            <div class=\"col-sm-12\">\n                <button action=\"sort\" by=\"author\" class=\"btn btn-default\">\n                    <i class=\"glyphicon glyphicon-chevron-down\"></i>\n                    Author\n                </button>\n                <button action=\"sort\" by=\"title\" class=\"btn btn-default\">\n                    <i class=\"glyphicon glyphicon-chevron-down\"></i>\n                    Title\n                </button>\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"col-sm-12\">\n                <input class=\"form-control\" type=\"text\" id=\"filter\" placeholder=\"Filter...\"/>\n            </div>\n        </div>\n        <ul class=\"list-group\"></ul>\n    </div>\n</div>\n");
-
-	JST.form = _.template("\n<div class=\"row\">\n    <h2 class=\"col-sm-12\">Add a new song</h2>\n    <form class=\"col-sm-12\">\n        <div class=\"form-group\">\n            <label for=\"author\">Author</label>\n            <input type=\"text\" name=\"author\" id=\"author\" class=\"form-control\" value=\"<%= author %>\"/>\n        </div>\n\n        <div class=\"form-group\">\n            <label for=\"title\">Title</label>\n            <input type=\"text\" name=\"title\" id=\"title\" class=\"form-control\" value=\"<%= title %>\"/>\n        </div>\n        <div class=\"form-group\">\n            <button type=\"submit\" class=\"btn btn-success\">Submit</button>\n            <a href=\"#/\" type=\"submit\" class=\"btn btn-default\">Back</a>\n        </div>\n    </form>\n</div>\n");
-
-	module.exports = JST;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var Validation = _interopRequire(__webpack_require__(10));
+	var Validation = _interopRequire(__webpack_require__(9));
 
-	var Render = _interopRequire(__webpack_require__(9));
+	var Render = _interopRequire(__webpack_require__(10));
 
 	var FormView = Marionette.ItemView.extend({
 	    ui: {
@@ -325,67 +298,41 @@
 	module.exports = FormView;
 
 /***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	module.exports = {
+	    runSort: function runSort(what, desc) {
+	        var models;
+	        models = this.sortBy(what);
+	        if (desc) {
+	            models = models.reverse();
+	        }
+	        return new this.constructor(models);
+	    }
+	};
+
+/***/ },
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+	module.exports = {
+	    runFilter: function runFilter(predicate) {
+	        var models;
+	        models = this.filter(function (item) {
+	            return JSON.stringify(item).toLowerCase().indexOf(predicate) != -1;
+	        });
 
-	var Render = _interopRequire(__webpack_require__(9));
-
-	var SongView = Marionette.ItemView.extend({
-	    tagName: "li",
-	    className: "list-group-item",
-	    template: _.template("<strong><%= author %></strong> - <%= title %>")
-	});
-
-	module.exports = SongView;
+	        return new this.constructor(models);
+	    }
+	};
 
 /***/ },
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var ItemRender = {
-	    render: function render() {
-	        this.$el.html(this.template(this.model.attributes));
-	        return this;
-	    }
-	};
-	var CollectionRender = {
-	    render: function render() {
-	        if (this.template) {
-	            this.$el.html(this.template());
-	        }
-	        this.renderChildren();
-	        return this;
-	    },
-	    renderChildren: function renderChildren() {
-	        var _this = this;
-
-	        var collectionRoot = this.$(this.collectionRoot) || this.$el;
-	        collectionRoot.empty();
-	        this.collection.forEach(function (item) {
-	            var view = new _this.modelView({
-	                model: item
-	            });
-
-	            collectionRoot.append(view.render().el);
-	        });
-
-	        return this;
-	    }
-	};
-
-	module.exports = {
-	    item: ItemRender,
-	    collection: CollectionRender
-	};
-
-/***/ },
-/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -434,38 +381,70 @@
 	//
 
 /***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var ItemRender = {
+	    render: function render() {
+	        this.$el.html(this.template(this.model.attributes));
+	        return this;
+	    }
+	};
+	var CollectionRender = {
+	    render: function render() {
+	        if (this.template) {
+	            this.$el.html(this.template());
+	        }
+	        this.renderChildren();
+	        return this;
+	    },
+	    renderChildren: function renderChildren() {
+	        var _this = this;
+
+	        var collectionRoot = this.$(this.collectionRoot) || this.$el;
+	        collectionRoot.empty();
+	        this.collection.forEach(function (item) {
+	            var view = new _this.modelView({
+	                model: item
+	            });
+
+	            collectionRoot.append(view.render().el);
+	        });
+
+	        return this;
+	    }
+	};
+
+	module.exports = {
+	    item: ItemRender,
+	    collection: CollectionRender
+	};
+
+/***/ },
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var Song = Backbone.Model.extend({
-	    defaults: {
-	        author: "Unknown Artist",
-	        title: "Unnamed Track"
-	    },
-	    validation: {
-	        title: {
-	            required: true,
-	            msg: "You must provide the title"
-	        },
-	        author: {
-	            required: true,
-	            msg: "You must provide the author"
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var Songs = _interopRequire(__webpack_require__(2));
+
+	var SongsResource = (function () {
+	    var metalSongs;
+
+	    metalSongs = new Songs();
+
+	    return {
+	        collection: function collection() {
+	            return metalSongs;
 	        }
-	    },
-	    parse: function parse(attr) {
-	        return {
-	            author: attr.artistName,
-	            title: attr.trackName,
-	            id: attr.trackId,
-	            price: attr.trackPrice
-	        };
-	    }
+	    };
+	})();
 
-	});
-
-	module.exports = Song;
+	module.exports = SongsResource;
 
 /***/ },
 /* 12 */
@@ -473,16 +452,13 @@
 
 	"use strict";
 
-	module.exports = {
-	    runSort: function runSort(what, desc) {
-	        var models;
-	        models = this.sortBy(what);
-	        if (desc) {
-	            models = models.reverse();
-	        }
-	        return new this.constructor(models);
-	    }
-	};
+	var JST = {};
+
+	JST.songs = _.template("\n<div class=\"row\">\n    <div class=\"col-sm-12\">\n        <h1>Hello Backbone <a href=\"#/add\" class=\"btn btn-default pull-right\">Add new song</a></h1>\n\n        <div class=\"row\">\n            <div class=\"col-sm-12\">\n                <button action=\"sort\" by=\"author\" class=\"btn btn-default\">\n                    <i class=\"glyphicon glyphicon-chevron-down\"></i>\n                    Author\n                </button>\n                <button action=\"sort\" by=\"title\" class=\"btn btn-default\">\n                    <i class=\"glyphicon glyphicon-chevron-down\"></i>\n                    Title\n                </button>\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"col-sm-12\">\n                <input class=\"form-control\" type=\"text\" id=\"filter\" placeholder=\"Filter...\"/>\n            </div>\n        </div>\n        <ul class=\"list-group\"></ul>\n    </div>\n</div>\n");
+
+	JST.form = _.template("\n<div class=\"row\">\n    <h2 class=\"col-sm-12\">Add a new song</h2>\n    <form class=\"col-sm-12\">\n        <div class=\"form-group\">\n            <label for=\"author\">Author</label>\n            <input type=\"text\" name=\"author\" id=\"author\" class=\"form-control\" value=\"<%= author %>\"/>\n        </div>\n\n        <div class=\"form-group\">\n            <label for=\"title\">Title</label>\n            <input type=\"text\" name=\"title\" id=\"title\" class=\"form-control\" value=\"<%= title %>\"/>\n        </div>\n        <div class=\"form-group\">\n            <button type=\"submit\" class=\"btn btn-success\">Submit</button>\n            <a href=\"#/\" type=\"submit\" class=\"btn btn-default\">Back</a>\n        </div>\n    </form>\n</div>\n");
+
+	module.exports = JST;
 
 /***/ },
 /* 13 */
@@ -490,16 +466,37 @@
 
 	"use strict";
 
-	module.exports = {
-	    runFilter: function runFilter(predicate) {
-	        var models;
-	        models = this.filter(function (item) {
-	            return JSON.stringify(item).toLowerCase().indexOf(predicate) != -1;
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var Songs = _interopRequire(__webpack_require__(11));
+
+	var SongsView = _interopRequire(__webpack_require__(3));
+
+	var SongForm = _interopRequire(__webpack_require__(4));
+
+	var AppController = Marionette.Controller.extend({
+
+	    index: function index() {
+	        var songs = Songs.collection();
+	        var view = new SongsView({
+	            collection: songs
 	        });
 
-	        return new this.constructor(models);
+	        window.App.root.show(view);
+	        songs.fetch({ remove: false });
+	    },
+	    addSong: function addSong() {
+	        var songs = Songs.collection();
+
+	        var view = new SongForm({
+	            collection: songs
+	        });
+
+	        window.App.root.show(view);
 	    }
-	};
+	});
+
+	module.exports = AppController;
 
 /***/ }
 /******/ ]);
