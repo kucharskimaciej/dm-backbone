@@ -2,11 +2,18 @@ import JST from '../templates.js';
 import SongView from './Song.js';
 import Render from '../mixins/Render.js';
 
-var SongsView = Backbone.View.extend({
+var SongsView = Marionette.CompositeView.extend({
     template: JST['songs'],
+    ui: {
+        'filter': '#filter',
+        'sortButton': '[action=sort]'
+    },
     events: {
-        'keyup #filter': 'onFilter',
-        'click [action=sort]': 'onSort'
+        'keyup @ui.filter': 'onFilter',
+        'click @ui.sortButton': 'onSort'
+    },
+    collectionEvents: {
+        'add' : 'onAdd'
     },
     sort: {
         by: 'author',
@@ -16,11 +23,10 @@ var SongsView = Backbone.View.extend({
     sortDownIcon: 'glyphicon-chevron-down',
     initialize: function () {
         this._collection = this.collection;
-        this.listenTo(this._collection, 'add', this.onAdd);
         this.render();
     },
-    collectionRoot: 'ul',
-    modelView: SongView,
+    childViewContainer: 'ul',
+    childView: SongView,
     runFilter: function () {
         var filter;
         filter = this.$('#filter').val().toLowerCase();
@@ -36,7 +42,7 @@ var SongsView = Backbone.View.extend({
         this.collection = this.runFilter();
         this.collection = this.runSort(this.sort);
 
-        this.renderChildren();
+        this._renderChildren();
     },
     onSort: function (ev) {
         this.collection = this.runSort({
@@ -48,13 +54,12 @@ var SongsView = Backbone.View.extend({
             .toggleClass(this.sortUpIcon)
             .toggleClass(this.sortDownIcon);
 
-        this.renderChildren();
+        this._renderChildren();
     },
     onAdd: function () {
         this.onFilter();
     }
 });
 
-_.extend(SongsView.prototype, Render.collection);
 
 module.exports = SongsView;

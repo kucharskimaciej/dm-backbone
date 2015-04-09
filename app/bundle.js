@@ -148,11 +148,18 @@
 
 	var Render = _interopRequire(__webpack_require__(9));
 
-	var SongsView = Backbone.View.extend({
+	var SongsView = Marionette.CompositeView.extend({
 	    template: JST.songs,
+	    ui: {
+	        filter: "#filter",
+	        sortButton: "[action=sort]"
+	    },
 	    events: {
-	        "keyup #filter": "onFilter",
-	        "click [action=sort]": "onSort"
+	        "keyup @ui.filter": "onFilter",
+	        "click @ui.sortButton": "onSort"
+	    },
+	    collectionEvents: {
+	        add: "onAdd"
 	    },
 	    sort: {
 	        by: "author",
@@ -162,11 +169,10 @@
 	    sortDownIcon: "glyphicon-chevron-down",
 	    initialize: function initialize() {
 	        this._collection = this.collection;
-	        this.listenTo(this._collection, "add", this.onAdd);
 	        this.render();
 	    },
-	    collectionRoot: "ul",
-	    modelView: SongView,
+	    childViewContainer: "ul",
+	    childView: SongView,
 	    runFilter: function runFilter() {
 	        var filter;
 	        filter = this.$("#filter").val().toLowerCase();
@@ -182,7 +188,7 @@
 	        this.collection = this.runFilter();
 	        this.collection = this.runSort(this.sort);
 
-	        this.renderChildren();
+	        this._renderChildren();
 	    },
 	    onSort: function onSort(ev) {
 	        this.collection = this.runSort({
@@ -192,14 +198,12 @@
 
 	        this.$(ev.currentTarget).find(".glyphicon").toggleClass(this.sortUpIcon).toggleClass(this.sortDownIcon);
 
-	        this.renderChildren();
+	        this._renderChildren();
 	    },
 	    onAdd: function onAdd() {
 	        this.onFilter();
 	    }
 	});
-
-	_.extend(SongsView.prototype, Render.collection);
 
 	module.exports = SongsView;
 
@@ -330,13 +334,11 @@
 
 	var Render = _interopRequire(__webpack_require__(9));
 
-	var SongView = Backbone.View.extend({
+	var SongView = Marionette.ItemView.extend({
 	    tagName: "li",
 	    className: "list-group-item",
 	    template: _.template("<strong><%= author %></strong> - <%= title %>")
 	});
-
-	_.extend(SongView.prototype, Render.item);
 
 	module.exports = SongView;
 
