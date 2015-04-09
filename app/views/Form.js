@@ -2,11 +2,11 @@ import Validation from '../mixins/Validations.js';
 import Render from '../mixins/Render.js';
 
 var FormView = Marionette.ItemView.extend({
+    behaviors: {
+        Submitable: {}
+    },
     ui: {
         'form' : 'form'
-    },
-    triggers: {
-        'submit @ui.form': 'submit'
     },
     events: {
         'keyup @ui.form': 'runValidation'
@@ -20,16 +20,6 @@ var FormView = Marionette.ItemView.extend({
 
     initialize: function (opts) {
         this.submitCallback = opts.submitCallback || this.submitCallback;
-        this.resetModel();
-        this.render();
-    },
-    onSubmit: function () {
-        if(!this.runValidation()) {
-            return;
-        }
-
-        this.submitCallback(this, this.model, this.collection);
-
         this.resetModel();
         this.render();
     },
