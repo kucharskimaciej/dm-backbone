@@ -279,10 +279,15 @@
 
 	var Render = _interopRequire(__webpack_require__(9));
 
-	var FormView = Backbone.View.extend({
+	var FormView = Marionette.ItemView.extend({
+	    ui: {
+	        form: "form"
+	    },
+	    triggers: {
+	        "submit @ui.form": "submit"
+	    },
 	    events: {
-	        "submit form": "onSubmit",
-	        "keyup form": "runValidation"
+	        "keyup @ui.form": "runValidation"
 	    },
 	    resetModel: function resetModel() {
 	        this.unbindValidation();
@@ -296,9 +301,7 @@
 	        this.resetModel();
 	        this.render();
 	    },
-	    onSubmit: function onSubmit(ev) {
-	        ev.preventDefault();
-
+	    onSubmit: function onSubmit() {
 	        if (!this.runValidation()) {
 	            return;
 	        }
@@ -314,7 +317,6 @@
 	});
 
 	_.defaults(FormView.prototype, Validation);
-	_.extend(FormView.prototype, Render.item);
 
 	module.exports = FormView;
 

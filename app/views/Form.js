@@ -1,10 +1,15 @@
 import Validation from '../mixins/Validations.js';
 import Render from '../mixins/Render.js';
 
-var FormView = Backbone.View.extend({
+var FormView = Marionette.ItemView.extend({
+    ui: {
+        'form' : 'form'
+    },
+    triggers: {
+        'submit @ui.form': 'submit'
+    },
     events: {
-        'submit form': 'onSubmit',
-        'keyup form': 'runValidation'
+        'keyup @ui.form': 'runValidation'
     },
     resetModel: function () {
         this.unbindValidation();
@@ -18,9 +23,7 @@ var FormView = Backbone.View.extend({
         this.resetModel();
         this.render();
     },
-    onSubmit: function (ev) {
-        ev.preventDefault();
-
+    onSubmit: function () {
         if(!this.runValidation()) {
             return;
         }
@@ -36,6 +39,5 @@ var FormView = Backbone.View.extend({
 });
 
 _.defaults(FormView.prototype, Validation);
-_.extend(FormView.prototype, Render.item);
 
 module.exports = FormView;
